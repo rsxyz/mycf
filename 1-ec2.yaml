@@ -8,7 +8,7 @@ Resources:
       ImageId: ami-00068cd7555f543d5
       InstanceType: t2.micro
       KeyName: jan8
-      SubnetId: subnet-0c07c02c7410ea466
+      SubnetId: subnet-0e3b397242dff1d65
       SecurityGroupIds:
-        - sg-025f4a80b0ab3ef70
+        - sg-00d7dbd7c05918fde
       
