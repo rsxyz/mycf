@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+Resources: 
+  MyInstance1:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      AvailabilityZone: us-east-1a
+      ImageId: ami-00068cd7555f543d5
+      InstanceType: t2.micro
+      KeyName: jan8
+      SubnetId: subnet-0c07c02c7410ea466
+      SecurityGroupIds:
+        - sg-025f4a80b0ab3ef70
+      
