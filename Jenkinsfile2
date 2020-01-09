@@ -1,0 +1,46 @@
+pipeline {
+  agent any
+  parameters {
+        string(name: 'AWS_DEFAULT_REGION', defaultValue: 'us-east-1', description: 'The region to deploy to')
+  }
+
+  stages {
+    stage('checkout'){
+        steps{
+            git url: 'https://github.com/rsxyz/mycf.git'
+            sh "pwd;ls -lat"
+        }
+    }
+    stage('create stack') {
+        steps {
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: 'awstoken',
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+            ]]) {             
+                  sh '''#!/usr/bin/env bash
+                    env | sort -u
+                    aws ec2 describe-instances
+                    if aws cloudformation describe-stacks  --query 'Stacks[].StackName' | grep jenkinsHello ; then
+                      aws cloudformation update-stack  --stack-name jenkinsHello --template-body file://1-ec2.yaml  
+                    else
+                      aws cloudformation create-stack  --stack-name jenkinsHello --template-body file://1-ec2.yaml  
+                    fi
+                    '''
+
+                    sh '''#!/usr/bin/env bash
+                    sleep 30
+                    export status=$(aws cloudformation describe-stacks  --stack-name=jenkinsHello --query Stacks[].StackStatus --output text)
+                    while [[ $status != *COMPLETE &&  $status != *FAILED ]]; do
+                    sleep 30
+                    export status=$(aws cloudformation describe-stacks  --stack-name=jenkinsHello --query Stacks[].StackStatus --output text)
+                    done
+                    echo $status
+                    [[ $status == "UPDATE_COMPLETE" || $status == "CREATE_COMPLETE" ]]
+                    '''
+                } // withCredentials
+        } // steps        
+    } //stage
+  } //stages
+} // pipeline
