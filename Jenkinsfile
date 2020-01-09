@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('checkout'){
         steps{
-            git scm
+            git url: 'https://github.com/rsxyz/mycf.git'
             sh "pwd;ls -lat"
         }
     }
